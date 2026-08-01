@@ -1,474 +1,866 @@
+<artifact type="code" language="html" title="index.html – falbk Unterrichtsassistent v2 (Liquid Glass)">
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#FF6B35" />
-  <link rel="manifest" href="manifest.json" />
-  <title>Unterrichtsassistent PWA</title>
-  <style>
-    :root {
-      --accent: #FF6B35; /* Orange */
-      --bg: #f7f9fb;
-      --fg: #2C3E50; /* Dunkelgrau */
-      --muted: #7f8c8d;
-      --card: #ffffff;
-      --shadow: 0 6px 16px rgba(0,0,0,0.08);
-    }
-    [data-theme="dark"] {
-      --bg: #11161c;
-      --fg: #e6eef7;
-      --muted: #a0b3c1;
-      --card: #1a222b;
-      --shadow: 0 6px 16px rgba(0,0,0,0.4);
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>falbk Unterrichtsassistent</title>
+<meta name="theme-color" content="#1a1a2e" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23E8500A'/%3E%3Ctext x='32' y='38' font-family='Arial, Helvetica, sans-serif' font-size='26' text-anchor='middle' fill='white' font-weight='700'%3EFA%3C/text%3E%3C/svg%3E" />
+<link rel="manifest" href="data:application/manifest+json,{%22name%22:%22falbk%20Unterrichtsassistent%22,%22short_name%22:%22falbk%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%231a1a2e%22,%22theme_color%22:%22%231a1a2e%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Ccircle%20cx='32'%20cy='32'%20r='30'%20fill='%23E8500A'/%3E%3Ctext%20x='32'%20y='38'%20font-family='Arial'%20font-size='26'%20text-anchor='middle'%20fill='white'%20font-weight='700'%3EFA%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22any%22,%22type%22:%22image/svg+xml%22}]}" />
 
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: var(--bg); color: var(--fg);
-      display: flex; flex-direction: column; min-height: 100vh;
-    }
+<style>
+:root{
+  --primary: #E8500A;
+  --bg: #1a1a2e;
+  --glass: rgba(255,255,255,0.08);
+  --text: #e6e6f0;
+  --muted: #b8b8c7;
+  --shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+:root.light{
+  --bg: #f0f2f8;
+  --glass: rgba(255,255,255,0.72);
+  --text: #1a1a2e;
+  --muted: #4a4a6a;
+}
+html,body{height:100%; margin:0;}
+body{
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color:var(--text);
+  background: radial-gradient(ellipse 900px 500px at 75% -5%, rgba(232,80,10,0.22), transparent 70%), var(--bg);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+.app{ display:flex; flex-direction:column; min-height:100dvh; padding:12px 12px 88px; gap:12px; }
 
-    header {
-      position: sticky; top: 0; z-index: 10;
-      background: var(--card); box-shadow: var(--shadow);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 16px; gap: 12px;
-    }
-    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: .3px; }
-    .logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), #ff9d70); box-shadow: inset 0 0 0 2px rgba(255,255,255,.6); }
+/* Header */
+.header{
+  position:sticky; top:0; z-index:20;
+  backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
+  background: linear-gradient(160deg, rgba(255,255,255,0.13), rgba(255,255,255,0.04));
+  border:1px solid rgba(255,255,255,0.18); border-radius:20px;
+  padding:14px 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.header-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.05em; }
+.brand-badge{
+  width:38px; height:38px; border-radius:12px;
+  background: linear-gradient(135deg, #E8500A, #ff8c42);
+  display:grid; place-items:center; color:white; font-weight:900; font-size:15px;
+  box-shadow: 0 6px 20px rgba(232,80,10,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+.controls{ margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.select{
+  appearance:none; border-radius:12px; border:1px solid rgba(255,255,255,0.2);
+  padding:9px 14px; background: rgba(255,255,255,0.1); color:var(--text);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2); outline:none; font-size:0.9em; cursor:pointer;
+}
+.select option{ background: #1a1a2e; color: #e6e6f0; }
+:root.light .select option{ background: #fff; color: #1a1a2e; }
 
-    nav { display: flex; gap: 8px; flex-wrap: wrap; }
-    nav button {
-      background: transparent; color: var(--fg); border: 1px solid rgba(0,0,0,0.08);
-      border-color: color-mix(in srgb, var(--fg) 15%, transparent);
-      padding: 8px 12px; border-radius: 10px; cursor: pointer; transition: .2s transform, .2s background;
-    }
-    nav button.active, nav button:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+/* Cards */
+.card{
+  background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+  backdrop-filter: blur(20px) saturate(150%); -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border:1px solid rgba(255,255,255,0.18); border-radius:20px;
+  padding:18px; box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+:root.light .card{
+  background: linear-gradient(145deg, rgba(255,255,255,0.85), rgba(255,255,255,0.6));
+  border-color: rgba(255,255,255,0.9);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
+}
 
-    .actions { display: flex; align-items: center; gap: 8px; }
-    .pill {
-      border-radius: 999px; border: none; padding: 8px 12px; background: var(--accent); color: white; font-weight: 700; cursor: pointer;
-      box-shadow: 0 6px 14px rgba(255,107,53,0.32);
-    }
-    .icon-btn {
-      background: transparent; color: var(--fg); border: 1px solid rgba(0,0,0,0.08);
-      border-color: color-mix(in srgb, var(--fg) 15%, transparent);
-      padding: 8px 10px; border-radius: 10px; cursor: pointer;
-    }
+/* Bottom Nav */
+.tabs{
+  display:grid; grid-template-columns: repeat(5,1fr);
+  position:fixed; bottom:10px; left:10px; right:10px; z-index:30;
+  gap:6px;
+  backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
+  background: rgba(26,26,46,0.7); border:1px solid rgba(255,255,255,0.15);
+  border-radius:22px; padding:8px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+:root.light .tabs{ background: rgba(240,242,248,0.85); }
+.tab-btn{
+  background: transparent; border:none; border-radius:14px;
+  padding:10px 4px 8px; color:var(--muted); text-align:center;
+  font-size:10px; font-weight:600; cursor:pointer; transition: all .2s;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+}
+.tab-btn .icon{ font-size:20px; line-height:1; }
+.tab-btn.active{
+  background: linear-gradient(135deg, rgba(232,80,10,0.3), rgba(232,80,10,0.15));
+  color:#fff; box-shadow: 0 4px 12px rgba(232,80,10,0.25);
+}
 
-    main { width: min(1200px, 100%); margin: 18px auto; padding: 0 16px; flex: 1; }
-    .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
-    @media (min-width: 900px) {
-      .grid { grid-template-columns: repeat(12, 1fr); }
-      .col-4 { grid-column: span 4; }
-      .col-6 { grid-column: span 6; }
-      .col-8 { grid-column: span 8; }
-      .col-12 { grid-column: span 12; }
-    }
+/* Tab content */
+.tabcontent{ display:none; }
+.tabcontent.active{ display:flex; flex-direction:column; gap:12px; animation: fadeUp .25s ease; }
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
 
-    .card {
-      background: var(--card); border-radius: 14px; box-shadow: var(--shadow);
-      padding: 16px; min-height: 120px;
-    }
-    .card h3 { margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
-    .card .meta { color: var(--muted); font-size: .9rem; }
-    .row { display: flex; gap: 8px; flex-wrap: wrap; }
-    input, select, textarea {
-      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--fg) 15%, transparent);
-      background: color-mix(in srgb, var(--card) 96%, var(--bg)); color: var(--fg);
-    }
-    label { font-size: .9rem; color: var(--muted); }
-    .list { display: grid; gap: 8px; }
-    .item { display: flex; align-items: center; gap: 8px; padding: 10px; border: 1px dashed color-mix(in srgb, var(--fg) 15%, transparent); border-radius: 10px; }
-    .item input[type="checkbox"] { width: 18px; height: 18px; }
+/* Typography */
+.section-title{ font-weight:800; font-size:1.15em; margin:0 0 14px; letter-spacing:0.2px; }
+.small-muted{ color:var(--muted); font-size:12px; }
 
-    .timer-display { font-size: clamp(28px, 5vw, 56px); font-weight: 800; letter-spacing: 1px; }
-    .badge { background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--accent); padding: 2px 8px; border-radius: 999px; font-size: .8rem; }
+/* Buttons */
+.btn{
+  cursor:pointer; border:none; border-radius:12px; padding:10px 16px;
+  background: linear-gradient(135deg, #E8500A, #ff7a3a); color:white; font-weight:700;
+  box-shadow: 0 6px 18px rgba(232,80,10,0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+  transition: all .15s; font-size:0.9em; white-space:nowrap;
+}
+.btn:hover{ transform:translateY(-1px); box-shadow: 0 8px 24px rgba(232,80,10,0.5); }
+.btn:active{ transform:translateY(0); }
+.btn.ghost{
+  background: rgba(255,255,255,0.1); color:var(--text);
+  border:1px solid rgba(255,255,255,0.2); box-shadow: none;
+}
+.btn.ghost:hover{ background: rgba(255,255,255,0.18); }
+.btn.small{ padding:7px 12px; font-size:12px; border-radius:10px; }
+.btn.danger{ background: linear-gradient(135deg, #c0392b, #e74c3c); }
 
-    footer { text-align: center; color: var(--muted); padding: 18px; }
+/* Layout helpers */
+.row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.col{ display:flex; flex-direction:column; gap:8px; }
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-    /* Beamer-Optimierung */
-    .beamer { position: fixed; inset: 0; background: var(--bg); padding: 20px; display: none; }
-    .beamer.active { display: block; }
-    .beamer .timer-display { font-size: 14vmin; }
-    .beamer .goals { font-size: 4vmin; }
-  </style>
+/* Inputs */
+.input, textarea, select.input{
+  border-radius:12px; border:1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08); color:var(--text);
+  padding:10px 14px; outline:none; font-size:0.9em; font-family:inherit;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.15);
+  transition: border-color .2s;
+}
+:root.light .input, :root.light textarea{ background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.15); }
+.input:focus, textarea:focus{ border-color: rgba(232,80,10,0.6); box-shadow: 0 0 0 3px rgba(232,80,10,0.15); }
+
+/* Progress bar */
+.progress{ height:10px; border-radius:999px; background: rgba(255,255,255,0.1); overflow:hidden; border:1px solid rgba(255,255,255,0.15); }
+.progress > div{ height:100%; background: linear-gradient(90deg, #E8500A, #ff9a6a); width:0%; transition: width .3s ease; border-radius:999px; }
+
+/* Timer ring */
+.timer-ring{ width:210px; height:210px; position:relative; flex-shrink:0; }
+.timer-ring svg{ transform: rotate(-90deg); }
+.timer-text{ position:absolute; inset:0; display:grid; place-items:center; font-size:32px; font-weight:900; letter-spacing:-1px; }
+
+/* Drag items */
+.item{
+  display:flex; align-items:center; gap:10px; padding:12px 14px;
+  border-radius:14px; border:1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06); cursor:grab; transition: all .15s;
+  user-select:none;
+}
+:root.light .item{ background: rgba(255,255,255,0.7); }
+.item:hover{ background: rgba(255,255,255,0.12); }
+.item.dragging{ opacity:0.5; transform:scale(0.98); }
+.item.drag-over{ border-color: rgba(232,80,10,0.6); background: rgba(232,80,10,0.08); }
+.drag-handle{ color:var(--muted); font-size:18px; cursor:grab; flex-shrink:0; }
+
+/* Plan path */
+.plan-path-wrap{ overflow-x:auto; padding:10px 4px 16px; }
+.plan-path{
+  display:flex; align-items:center; gap:0; min-width:max-content;
+  padding:10px 0;
+}
+.plan-connector{ width:32px; height:3px; background: rgba(255,255,255,0.2); flex-shrink:0; position:relative; }
+.plan-connector::after{ content:'▶'; position:absolute; right:-6px; top:-8px; font-size:10px; color:rgba(255,255,255,0.3); }
+.plan-node{
+  min-width:130px; max-width:160px; padding:14px 12px; border-radius:16px;
+  border:2px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.07); text-align:center;
+  cursor:grab; transition: all .2s; flex-shrink:0; position:relative;
+}
+:root.light .plan-node{ background: rgba(255,255,255,0.75); }
+.plan-node:hover{ transform:translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.plan-node.current{
+  border-color: #E8500A;
+  background: rgba(232,80,10,0.15);
+  box-shadow: 0 0 0 4px rgba(232,80,10,0.2), 0 8px 24px rgba(232,80,10,0.25);
+  transform:translateY(-4px);
+}
+.plan-node.done{ opacity:0.55; }
+.plan-node.dragging{ opacity:0.4; }
+.node-step{ font-size:10px; color:var(--muted); margin-bottom:4px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+.node-title{ font-weight:700; font-size:0.9em; margin-bottom:6px; }
+.node-badge{
+  display:inline-block; font-size:10px; padding:3px 8px; border-radius:999px;
+  font-weight:700; margin-bottom:8px;
+}
+.badge-einstieg{ background:rgba(52,152,219,0.25); color:#74b9ff; }
+.badge-erarbeitung{ background:rgba(46,204,113,0.25); color:#55efc4; }
+.badge-sicherung{ background:rgba(241,196,15,0.25); color:#ffeaa7; }
+.badge-transfer{ background:rgba(155,89,182,0.25); color:#d7aefb; }
+.badge-abschluss{ background:rgba(232,80,10,0.25); color:#ffb38a; }
+.node-del{ position:absolute; top:6px; right:6px; background:rgba(231,76,60,0.2); border:none; border-radius:6px; color:#e74c3c; cursor:pointer; padding:2px 6px; font-size:11px; opacity:0; transition:.2s; }
+.plan-node:hover .node-del{ opacity:1; }
+
+/* QR grid */
+.qr-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap:12px; }
+.qr-card{
+  padding:14px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.07); display:flex; flex-direction:column;
+  gap:8px; align-items:center; text-align:center; cursor:grab;
+}
+:root.light .qr-card{ background: rgba(255,255,255,0.75); }
+.qr-card.dragging{ opacity:0.4; }
+.qr-img-wrap{ background:white; border-radius:10px; padding:6px; }
+.qr-name{ font-weight:700; font-size:0.85em; word-break:break-word; }
+.qr-url{ color:var(--muted); font-size:10px; word-break:break-all; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* Toggle switch */
+.toggle{ display:inline-flex; align-items:center; gap:10px; cursor:pointer; }
+.toggle input{ width:44px; height:26px; appearance:none; background: rgba(255,255,255,0.2); border-radius:999px; position:relative; outline:none; cursor:pointer; border:1px solid rgba(255,255,255,0.2); transition:.2s; }
+.toggle input::after{ content:""; position:absolute; width:20px; height:20px; left:3px; top:2px; background:#fff; border-radius:50%; transition: all .2s; box-shadow:0 2px 6px rgba(0,0,0,0.3); }
+.toggle input:checked{ background: rgba(232,80,10,0.7); border-color: rgba(232,80,10,0.9); }
+.toggle input:checked::after{ left:21px; }
+
+/* Beamer mode */
+body.beamer{ font-size:130%; }
+body.beamer .timer-text{ font-size:42px; }
+body.beamer .timer-ring{ width:260px; height:260px; }
+
+/* Checkbox */
+input[type="checkbox"].big{
+  width:22px; height:22px; accent-color: #E8500A; cursor:pointer; flex-shrink:0;
+}
+
+/* Klasse/Fach custom input */
+.custom-input-row{ display:flex; gap:6px; align-items:center; margin-top:6px; }
+
+/* Scrollbar */
+::-webkit-scrollbar{ width:6px; height:6px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.2); border-radius:3px; }
+
+/* Responsive */
+@media(max-width:600px){
+  .grid2{ grid-template-columns:1fr; }
+  .timer-ring{ width:180px; height:180px; }
+  .timer-text{ font-size:26px; }
+}
+</style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <div class="logo" aria-hidden="true"></div>
-      <div>
-        Unterrichtsassistent
-        <div class="meta">PWA – schnell, offline, gemeinsam</div>
+<div class="app" id="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-row">
+      <div class="brand">
+        <div class="brand-badge">FA</div>
+        falbk Unterrichtsassistent
       </div>
     </div>
-
-    <nav id="tabs" aria-label="Hauptnavigation">
-      <button data-tab="dashboard" class="active">Dashboard</button>
-      <button data-tab="ziele">Ziele</button>
-      <button data-tab="plan">Unterrichtsplan</button>
-      <button data-tab="zeit">Zeit</button>
-      <button data-tab="qr">QR</button>
-    </nav>
-
-    <div class="actions">
-      <button id="installBtn" class="pill" hidden>Installieren</button>
-      <button id="beamerBtn" class="icon-btn" title="Beamer-Modus">Beamer</button>
-      <button id="themeBtn" class="icon-btn" title="Dark Mode">🌓</button>
+    <div class="controls">
+      <div class="col" style="gap:4px;">
+        <label class="small-muted" style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px;">Klasse</label>
+        <select id="klasse" class="select">
+          <option>BG11</option><option>BG12</option><option>MT1</option><option>MT2</option>
+          <option>GD1</option><option>GD2</option><option>5a</option><option>6a</option>
+          <option>7a</option><option>8a</option><option>9a</option><option>10a</option>
+          <option value="__custom__">+ Eigene...</option>
+        </select>
+        <input id="klasseCustom" class="input" placeholder="Klasse eingeben..." style="display:none; max-width:160px;" />
+      </div>
+      <div class="col" style="gap:4px;">
+        <label class="small-muted" style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px;">Fach</label>
+        <select id="fach" class="select">
+          <option>Mathematik</option><option>Deutsch</option><option>Englisch</option>
+          <option>Physik</option><option>Chemie</option><option>Informatik</option>
+          <option>Biologie</option><option>Geschichte</option><option>Technik</option>
+          <option value="__custom__">+ Eigenes...</option>
+        </select>
+        <input id="fachCustom" class="input" placeholder="Fach eingeben..." style="display:none; max-width:160px;" />
+      </div>
+      <div class="col" style="gap:4px; justify-content:flex-end;">
+        <button class="btn small" id="saveSnapshot">💾 Speichern</button>
+        <span class="small-muted" id="saveInfo"></span>
+      </div>
     </div>
   </header>
 
+  <!-- MAIN CONTENT -->
   <main>
-    <section id="tab-dashboard" class="grid">
-      <div class="card col-8">
-        <h3>Aktueller Unterricht <span class="badge" id="lessonStage">Einstieg</span></h3>
-        <div class="row">
-          <div style="flex:2">
-            <label>Titel</label>
-            <input id="lessonTitle" placeholder="z.B. Brüche addieren" />
+
+    <!-- ===== TAB: TIMER ===== -->
+    <section id="tab-timer" class="tabcontent active">
+      <div class="card">
+        <div class="section-title">⏱️ Countdown Timer</div>
+        <div class="row" style="justify-content:center; gap:24px; flex-wrap:wrap;">
+          <div class="timer-ring" id="timerRing">
+            <svg width="210" height="210">
+              <circle cx="105" cy="105" r="92" stroke="rgba(255,255,255,0.1)" stroke-width="14" fill="none"/>
+              <circle id="timerProgress" cx="105" cy="105" r="92" stroke="url(#timerGrad)" stroke-width="14" stroke-linecap="round" fill="none" stroke-dasharray="578" stroke-dashoffset="578"/>
+              <defs>
+                <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#E8500A"/>
+                  <stop offset="100%" stop-color="#ff9a6a"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="timer-text" id="timerDisplay">00:00</div>
           </div>
-          <div style="flex:1">
-            <label>Klasse</label>
-            <input id="lessonClass" placeholder="z.B. 7b" />
+          <div class="col" style="min-width:240px; flex:1; max-width:380px;">
+            <div class="row">
+              <button class="btn" id="startTimer">▶ Start</button>
+              <button class="btn ghost" id="pauseTimer">⏸ Pause</button>
+              <button class="btn ghost" id="resetTimer">↺ Reset</button>
+            </div>
+            <div class="row">
+              <button class="btn small" data-preset="300">5 Min</button>
+              <button class="btn small" data-preset="600">10 Min</button>
+              <button class="btn small" data-preset="900">15 Min</button>
+              <button class="btn small" data-preset="1200">20 Min</button>
+              <button class="btn small" data-preset="1500">25 Min</button>
+              <button class="btn small" data-preset="1800">30 Min</button>
+            </div>
+            <div class="row">
+              <input id="customMin" type="number" class="input" min="0" max="120" value="5" placeholder="Min" style="max-width:80px;" />
+              <span class="small-muted">:</span>
+              <input id="customSec" type="number" class="input" min="0" max="59" value="0" placeholder="Sek" style="max-width:80px;" />
+              <button class="btn small" id="setCustom">Setzen</button>
+            </div>
           </div>
         </div>
-        <div class="row" style="margin-top:8px">
-          <button class="pill" id="startLesson">Starten</button>
-          <button class="icon-btn" id="advanceStage">Nächste Phase</button>
-          <button class="icon-btn" id="resetLesson">Zurücksetzen</button>
-        </div>
       </div>
 
-      <div class="card col-4">
-        <h3>Timer</h3>
-        <div class="timer-display" id="dashboardTimer">00:00</div>
-        <div class="row" style="margin-top:8px">
-          <button class="pill" id="dashStart">Start</button>
-          <button class="icon-btn" id="dashPause">Pause</button>
-          <button class="icon-btn" id="dashReset">Reset</button>
+      <div class="grid2">
+        <div class="card">
+          <div class="section-title">⏱ Stoppuhr</div>
+          <div id="swDisplay" style="font-size:28px; font-weight:900; margin:8px 0; letter-spacing:-1px;">00:00.00</div>
+          <div class="row">
+            <button class="btn small" id="swStart">▶ Start</button>
+            <button class="btn small ghost" id="swLap">🏁 Runde</button>
+            <button class="btn small ghost" id="swReset">↺ Reset</button>
+          </div>
+          <div id="swLaps" style="margin-top:10px; max-height:120px; overflow:auto; display:flex; flex-direction:column; gap:4px;"></div>
         </div>
-      </div>
 
-      <div class="card col-12">
-        <h3>Heute im Überblick</h3>
-        <div class="list" id="todayPlan"></div>
-      </div>
-    </section>
-
-    <section id="tab-ziele" class="grid" hidden>
-      <div class="card col-8">
-        <h3>Zielformulierungen</h3>
-        <div class="row">
-          <input id="goalInput" placeholder="Ziel hinzufügen (z.B. Ich kann den Hauptnenner bestimmen)" />
-          <button class="pill" id="addGoal">Hinzufügen</button>
-        </div>
-        <div class="list" id="goalList" style="margin-top:10px"></div>
-      </div>
-      <div class="card col-4">
-        <h3>Vorlagen</h3>
-        <div class="list" id="goalTemplates"></div>
-      </div>
-    </section>
-
-    <section id="tab-plan" class="grid" hidden>
-      <div class="card col-12">
-        <h3>Unterrichtsplan</h3>
-        <div class="row">
-          <input id="planTitle" placeholder="Titel des Plans" />
-          <button class="pill" id="addPlanItem">Schritt hinzufügen</button>
-        </div>
-        <div class="list" id="planList" style="margin-top:10px"></div>
-        <div class="row" style="margin-top:10px">
-          <button class="icon-btn" id="sharePlan">Teilen (QR)</button>
-          <button class="icon-btn" id="clearPlan">Leeren</button>
+        <div class="card">
+          <div class="section-title">🔔 Wecker</div>
+          <input type="time" id="alarmTime" class="input" style="margin-bottom:10px;" />
+          <div class="row">
+            <button class="btn small" id="setAlarm">Stellen</button>
+            <button class="btn small ghost" id="cancelAlarm">Abbrechen</button>
+          </div>
+          <div class="small-muted" id="alarmInfo" style="margin-top:10px;">Kein Wecker gestellt.</div>
         </div>
       </div>
     </section>
 
-    <section id="tab-zeit" class="grid" hidden>
-      <div class="card col-6">
-        <h3>Stoppuhr</h3>
-        <div class="timer-display" id="stopwatch">00:00.0</div>
-        <div class="row">
-          <button class="pill" id="swStart">Start</button>
-          <button class="icon-btn" id="swLap">Runde</button>
-          <button class="icon-btn" id="swStop">Stopp</button>
-          <button class="icon-btn" id="swReset">Reset</button>
+    <!-- ===== TAB: ZIELE ===== -->
+    <section id="tab-ziele" class="tabcontent">
+      <div class="card">
+        <div class="section-title">🎯 Stundenziele</div>
+        <div class="row" style="margin-bottom:10px;">
+          <input id="zielText" class="input" placeholder="Neues Ziel eingeben..." style="flex:1;" />
+          <button class="btn" id="addZiel">+ Hinzufügen</button>
         </div>
-        <div class="list" id="swLaps"></div>
-      </div>
-      <div class="card col-6">
-        <h3>Wecker</h3>
-        <div class="row">
-          <input id="alarmTime" type="time" />
-          <button class="pill" id="setAlarm">Setzen</button>
+        <div class="row" style="margin-bottom:14px; flex-wrap:wrap;">
+          <span class="small-muted" style="font-weight:700;">Vorlagen:</span>
+          <button class="btn small ghost" data-tpl="Die Lernenden können …">können …</button>
+          <button class="btn small ghost" data-tpl="Die Lernenden verstehen …">verstehen …</button>
+          <button class="btn small ghost" data-tpl="Die Lernenden wenden an …">wenden an …</button>
+          <button class="btn small ghost" data-tpl="Die Lernenden analysieren …">analysieren …</button>
+          <button class="btn small ghost" data-tpl="Die Lernenden beurteilen …">beurteilen …</button>
         </div>
-        <div id="alarmStatus" class="meta" style="margin-top:6px">Kein Wecker gesetzt</div>
-        <audio id="alarmSound">
-          <source src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAA…" type="audio/mp3">
-        </audio>
-      </div>
-      <div class="card col-12">
-        <h3>Countdown</h3>
-        <div class="row">
-          <input id="countMin" type="number" placeholder="Min" style="max-width:120px" />
-          <input id="countSec" type="number" placeholder="Sek" style="max-width:120px" />
-          <button class="pill" id="countStart">Start</button>
-          <button class="icon-btn" id="countPause">Pause</button>
-          <button class="icon-btn" id="countReset">Reset</button>
-        </div>
-        <div class="timer-display" id="countDisplay">00:00</div>
+        <div class="progress" style="margin-bottom:14px;"><div id="zieleProgress"></div></div>
+        <div id="zieleList" class="col"></div>
       </div>
     </section>
 
-    <section id="tab-qr" class="grid" hidden>
-      <div class="card col-6">
-        <h3>QR-Code Generator</h3>
-        <div class="row">
-          <input id="qrText" placeholder="Text oder URL" />
-          <button class="pill" id="makeQR">Erstellen</button>
+    <!-- ===== TAB: UNTERRICHTSPLAN ===== -->
+    <section id="tab-plan" class="tabcontent">
+      <div class="card">
+        <div class="section-title">🗺️ Unterrichtsplan</div>
+        <div class="row" style="margin-bottom:10px; flex-wrap:wrap;">
+          <input id="stepTitle" class="input" placeholder="Schritt-Titel..." style="flex:1; min-width:140px;" />
+          <select id="stepType" class="select">
+            <option value="einstieg">Einstieg</option>
+            <option value="erarbeitung">Erarbeitung</option>
+            <option value="sicherung">Sicherung</option>
+            <option value="transfer">Transfer</option>
+            <option value="abschluss">Abschluss</option>
+          </select>
+          <input id="stepDur" type="number" class="input" placeholder="Min" min="1" max="90" value="10" style="max-width:70px;" />
+          <button class="btn" id="addStep">+ Schritt</button>
         </div>
-        <canvas id="qrCanvas" style="margin-top:10px; background: white; border-radius:10px;"></canvas>
-        <div class="row" style="margin-top:8px">
-          <button class="icon-btn" id="saveQR">Speichern</button>
-          <button class="icon-btn" id="listQR">Gespeicherte anzeigen</button>
+        <div class="row" style="margin-bottom:14px;">
+          <span class="small-muted" style="font-weight:700;">Vorlagen:</span>
+          <button class="btn small ghost" id="tplStandard">Standard</button>
+          <button class="btn small ghost" id="tplProjekt">Projekt</button>
+          <button class="btn small ghost" id="tplDiskussion">Diskussion</button>
         </div>
-      </div>
-      <div class="card col-6">
-        <h3>Gespeicherte QR-Codes</h3>
-        <div id="qrSaved" class="list"></div>
+        <div class="plan-path-wrap">
+          <div class="plan-path" id="planPath"></div>
+        </div>
+        <div class="row" style="margin-top:14px; justify-content:space-between;">
+          <div class="row">
+            <button class="btn ghost" id="prevStep">◀ Zurück</button>
+            <button class="btn" id="nextStep">Weiter ▶</button>
+          </div>
+          <div class="row">
+            <span class="small-muted" id="planProgress">Schritt 0 / 0</span>
+            <button class="btn small ghost" id="resetPlan">↺ Neustart</button>
+          </div>
+        </div>
       </div>
     </section>
+
+    <!-- ===== TAB: LINKS / QR ===== -->
+    <section id="tab-qr" class="tabcontent">
+      <div class="card">
+        <div class="section-title">🔗 Links & QR-Codes</div>
+        <div class="row" style="flex-wrap:wrap; margin-bottom:14px;">
+          <input id="qrName" class="input" placeholder="Name (z.B. Arbeitsblatt)" style="flex:1; min-width:140px;" />
+          <input id="qrUrl" class="input" placeholder="https://..." style="flex:2; min-width:200px;" />
+          <button class="btn" id="addQR">QR erstellen</button>
+        </div>
+        <div class="qr-grid" id="qrGrid"></div>
+      </div>
+    </section>
+
+    <!-- ===== TAB: EINSTELLUNGEN ===== -->
+    <section id="tab-settings" class="tabcontent">
+      <div class="card">
+        <div class="section-title">⚙️ Einstellungen</div>
+        <div class="col" style="gap:18px;">
+          <label class="toggle">
+            <input type="checkbox" id="themeToggle"> <span>Helles Design</span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="beamerToggle"> <span>Beamer-Modus (größere Schrift)</span>
+          </label>
+          <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:16px;">
+            <div class="small-muted" style="margin-bottom:10px;">Daten werden pro Klasse + Fach im Browser gespeichert.</div>
+            <button class="btn danger small" id="clearData">🗑️ Daten für aktuelle Klasse/Fach löschen</button>
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:16px; opacity:0.6;">
+            <div style="font-weight:700; margin-bottom:4px;">falbk Unterrichtsassistent</div>
+            <div class="small-muted">Friedrich-Albert-Lange-Berufskolleg · Duisburg</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <div id="beamer" class="beamer">
-    <div class="timer-display" id="beamerTime">00:00</div>
-    <div class="goals" id="beamerGoals"></div>
-    <button class="pill" style="position: fixed; bottom: 20px; right: 20px" id="exitBeamer">Beenden</button>
-  </div>
+  <!-- BOTTOM NAV -->
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="timer"><span class="icon">⏱️</span>Timer</button>
+    <button class="tab-btn" data-tab="ziele"><span class="icon">🎯</span>Ziele</button>
+    <button class="tab-btn" data-tab="plan"><span class="icon">🗺️</span>Plan</button>
+    <button class="tab-btn" data-tab="qr"><span class="icon">🔗</span>Links</button>
+    <button class="tab-btn" data-tab="settings"><span class="icon">⚙️</span>Einst.</button>
+  </nav>
+</div>
 
-  <footer>
-    © Unterrichtsassistent – PWA. Offline nutzbar. Für iPad, Mac, Handy. Farbschema Orange #FF6B35 & Dunkelgrau #2C3E50.
-  </footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+// ─── Utilities ───────────────────────────────────────────────────────────────
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
+const fmt2 = n => String(n).padStart(2,'0');
 
-  <script>
-    // PWA Install
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault(); deferredPrompt = e; installBtn.hidden = false;
+// ─── Class / Subject key ─────────────────────────────────────────────────────
+function getKlasse(){
+  const s = $('#klasse'); const c = $('#klasseCustom');
+  return s.value === '__custom__' ? (c.value.trim()||'Klasse') : s.value;
+}
+function getFach(){
+  const s = $('#fach'); const c = $('#fachCustom');
+  return s.value === '__custom__' ? (c.value.trim()||'Fach') : s.value;
+}
+function storeKey(){ return `falbk__${getKlasse()}__${getFach()}`; }
+
+$('#klasse').addEventListener('change', () => {
+  $('#klasseCustom').style.display = $('#klasse').value === '__custom__' ? 'block' : 'none';
+  loadAll();
+});
+$('#fach').addEventListener('change', () => {
+  $('#fachCustom').style.display = $('#fach').value === '__custom__' ? 'block' : 'none';
+  loadAll();
+});
+$('#klasseCustom').addEventListener('change', loadAll);
+$('#fachCustom').addEventListener('change', loadAll);
+
+// ─── Persist ─────────────────────────────────────────────────────────────────
+function saveAll(){
+  const data = { goals, plan, currentStep, qrcards,
+    timer: { total: timer.total, remaining: timer.remaining } };
+  localStorage.setItem(storeKey(), JSON.stringify(data));
+  const el = $('#saveInfo');
+  el.textContent = '✓ Gespeichert ' + new Date().toLocaleTimeString();
+  setTimeout(() => el.textContent = '', 2500);
+}
+function loadAll(){
+  const raw = localStorage.getItem(storeKey());
+  const data = raw ? JSON.parse(raw) : {};
+  goals = data.goals || [];
+  plan = data.plan || [];
+  currentStep = data.currentStep || 0;
+  qrcards = data.qrcards || [];
+  if(data.timer){ timer.total = data.timer.total||0; timer.remaining = data.timer.remaining||0; }
+  renderGoals(); renderPlan(); renderQR(); renderTimer(); updateRing();
+}
+$('#saveSnapshot').addEventListener('click', saveAll);
+
+// ─── Tabs ─────────────────────────────────────────────────────────────────────
+$$('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    $$('.tabcontent').forEach(s => s.classList.remove('active'));
+    $(`#tab-${btn.dataset.tab}`).classList.add('active');
+  });
+});
+
+// ─── Theme & Beamer ──────────────────────────────────────────────────────────
+const root = document.documentElement;
+function loadGlobals(){
+  const g = JSON.parse(localStorage.getItem('falbk_globals')||'{}');
+  root.classList.toggle('light', !!g.light);
+  $('#themeToggle').checked = !!g.light;
+  document.body.classList.toggle('beamer', !!g.beamer);
+  $('#beamerToggle').checked = !!g.beamer;
+}
+function saveGlobals(){
+  localStorage.setItem('falbk_globals', JSON.stringify({
+    light: $('#themeToggle').checked, beamer: $('#beamerToggle').checked
+  }));
+}
+$('#themeToggle').addEventListener('change', () => { root.classList.toggle('light', $('#themeToggle').checked); saveGlobals(); });
+$('#beamerToggle').addEventListener('change', () => { document.body.classList.toggle('beamer', $('#beamerToggle').checked); saveGlobals(); });
+$('#clearData').addEventListener('click', () => {
+  if(!confirm('Alle Daten für ' + getKlasse() + ' / ' + getFach() + ' löschen?')) return;
+  localStorage.removeItem(storeKey());
+  goals=[]; plan=[]; currentStep=0; qrcards=[];
+  timer={total:0,remaining:0,running:false,int:null,startTs:0};
+  renderGoals(); renderPlan(); renderQR(); renderTimer(); updateRing();
+});
+
+// ─── TIMER ───────────────────────────────────────────────────────────────────
+let timer = { total:0, remaining:0, running:false, int:null, startTs:0 };
+const CIRC = 2 * Math.PI * 92;
+
+function renderTimer(){
+  const m = Math.floor(timer.remaining / 60);
+  const s = timer.remaining % 60;
+  $('#timerDisplay').textContent = fmt2(m) + ':' + fmt2(s);
+}
+function updateRing(){
+  const pct = timer.total > 0 ? (1 - timer.remaining / timer.total) : 0;
+  const offset = CIRC - pct * CIRC;
+  $('#timerProgress').setAttribute('stroke-dasharray', CIRC);
+  $('#timerProgress').setAttribute('stroke-dashoffset', Math.max(0, offset));
+}
+function timerTick(){
+  if(!timer.running) return;
+  const elapsed = Math.floor((Date.now() - timer.startTs) / 1000);
+  timer.remaining = Math.max(0, timer.total - elapsed);
+  renderTimer(); updateRing();
+  if(timer.remaining === 0){ stopTimer(); playBeep(); }
+}
+function stopTimer(){ timer.running=false; clearInterval(timer.int); }
+
+$('#startTimer').addEventListener('click', () => {
+  if(timer.total <= 0) return;
+  timer.running = true;
+  timer.startTs = Date.now() - (timer.total - timer.remaining) * 1000;
+  clearInterval(timer.int);
+  timer.int = setInterval(timerTick, 250);
+  saveAll();
+});
+$('#pauseTimer').addEventListener('click', () => { stopTimer(); saveAll(); });
+$('#resetTimer').addEventListener('click', () => { stopTimer(); timer.remaining = timer.total; renderTimer(); updateRing(); saveAll(); });
+$$('[data-preset]').forEach(b => b.addEventListener('click', () => {
+  timer.total = parseInt(b.dataset.preset);
+  timer.remaining = timer.total;
+  renderTimer(); updateRing(); saveAll();
+}));
+$('#setCustom').addEventListener('click', () => {
+  const m = Math.max(0, parseInt($('#customMin').value)||0);
+  const s = Math.max(0, Math.min(59, parseInt($('#customSec').value)||0));
+  timer.total = m*60 + s; timer.remaining = timer.total;
+  renderTimer(); updateRing(); saveAll();
+});
+
+function playBeep(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    [0,0.3,0.6].forEach(t => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = 880; o.type = 'sine';
+      g.gain.setValueAtTime(0.4, ctx.currentTime+t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+t+0.25);
+      o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+0.25);
     });
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; installBtn.hidden = true; deferredPrompt = null;
+  }catch(e){}
+}
+
+// ─── STOPWATCH ───────────────────────────────────────────────────────────────
+let sw = { running:false, startTs:0, pausedAt:0, int:null, laps:[] };
+function renderSW(){
+  const elapsed = sw.running ? Date.now()-sw.startTs : sw.pausedAt;
+  const ms = Math.floor(elapsed%1000/10);
+  const s = Math.floor(elapsed/1000)%60;
+  const m = Math.floor(elapsed/60000);
+  $('#swDisplay').textContent = fmt2(m)+':'+fmt2(s)+'.'+fmt2(ms);
+}
+$('#swStart').addEventListener('click', () => {
+  if(!sw.running){
+    sw.running=true; sw.startTs = Date.now()-sw.pausedAt;
+    sw.int = setInterval(renderSW, 30);
+    $('#swStart').textContent='⏸ Pause';
+  } else {
+    sw.running=false; sw.pausedAt = Date.now()-sw.startTs;
+    clearInterval(sw.int); $('#swStart').textContent='▶ Start';
+  }
+});
+$('#swLap').addEventListener('click', () => {
+  if(!sw.running) return;
+  const t = Date.now()-sw.startTs; sw.laps.push(t);
+  const ms=Math.floor(t%1000/10), s=Math.floor(t/1000)%60, m=Math.floor(t/60000);
+  const el = document.createElement('div');
+  el.className='small-muted'; el.style.padding='3px 0';
+  el.textContent = `Runde ${sw.laps.length}: ${fmt2(m)}:${fmt2(s)}.${fmt2(ms)}`;
+  $('#swLaps').prepend(el);
+});
+$('#swReset').addEventListener('click', () => {
+  sw.running=false; clearInterval(sw.int); sw.pausedAt=0; sw.laps=[];
+  $('#swLaps').innerHTML=''; $('#swStart').textContent='▶ Start'; renderSW();
+});
+renderSW();
+
+// ─── ALARM ───────────────────────────────────────────────────────────────────
+let alarmTs=0, alarmInt=null;
+$('#setAlarm').addEventListener('click', () => {
+  const v = $('#alarmTime').value; if(!v) return;
+  const [h,m] = v.split(':').map(Number);
+  const t = new Date(); t.setHours(h,m,0,0);
+  if(t < new Date()) t.setDate(t.getDate()+1);
+  alarmTs = +t;
+  $('#alarmInfo').textContent = '🔔 Wecker gestellt für ' + t.toLocaleTimeString();
+  if(alarmInt) clearInterval(alarmInt);
+  alarmInt = setInterval(() => {
+    if(Date.now() >= alarmTs){
+      clearInterval(alarmInt); alarmTs=0;
+      $('#alarmInfo').textContent='Kein Wecker gestellt.';
+      playBeep(); alert('🔔 Wecker!');
+    }
+  }, 1000);
+});
+$('#cancelAlarm').addEventListener('click', () => {
+  clearInterval(alarmInt); alarmTs=0;
+  $('#alarmInfo').textContent='Kein Wecker gestellt.';
+});
+
+// ─── ZIELE ───────────────────────────────────────────────────────────────────
+let goals = [];
+let dragSrcGoal = null;
+
+function renderGoals(){
+  const list = $('#zieleList'); list.innerHTML='';
+  goals.forEach((g,i) => {
+    const it = document.createElement('div');
+    it.className='item'; it.draggable=true;
+    it.innerHTML = `
+      <span class="drag-handle">⠿</span>
+      <input type="checkbox" class="big" ${g.done?'checked':''} data-gi="${i}">
+      <div style="flex:1; ${g.done?'text-decoration:line-through;opacity:.55;':''}">${g.text}</div>
+      <button class="btn small ghost" data-gdel="${i}" style="flex-shrink:0;">✕</button>`;
+    it.addEventListener('dragstart', e => { dragSrcGoal=i; it.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+    it.addEventListener('dragend', () => { it.classList.remove('dragging'); $$('.item').forEach(x=>x.classList.remove('drag-over')); });
+    it.addEventListener('dragover', e => { e.preventDefault(); it.classList.add('drag-over'); });
+    it.addEventListener('dragleave', () => it.classList.remove('drag-over'));
+    it.addEventListener('drop', e => {
+      e.preventDefault(); it.classList.remove('drag-over');
+      if(dragSrcGoal===null||dragSrcGoal===i) return;
+      const moved = goals.splice(dragSrcGoal,1)[0]; goals.splice(i,0,moved);
+      dragSrcGoal=null; renderGoals(); saveAll();
     });
+    list.appendChild(it);
+  });
+  $$('[data-gi]').forEach(cb => cb.addEventListener('change', () => {
+    goals[cb.dataset.gi].done = cb.checked; renderGoals(); saveAll();
+  }));
+  $$('[data-gdel]').forEach(b => b.addEventListener('click', () => {
+    goals.splice(parseInt(b.dataset.gdel),1); renderGoals(); saveAll();
+  }));
+  updateGoalProgress();
+}
+function updateGoalProgress(){
+  const p = goals.length ? Math.round(100*goals.filter(g=>g.done).length/goals.length) : 0;
+  $('#zieleProgress').style.width = p+'%';
+}
+$('#addZiel').addEventListener('click', () => {
+  const t = $('#zielText').value.trim(); if(!t) return;
+  goals.push({text:t, done:false}); $('#zielText').value=''; renderGoals(); saveAll();
+});
+$('#zielText').addEventListener('keydown', e => { if(e.key==='Enter') $('#addZiel').click(); });
+$$('[data-tpl]').forEach(b => b.addEventListener('click', () => {
+  $('#zielText').value = b.dataset.tpl; $('#zielText').focus();
+}));
 
-    // Theme
-    const themeBtn = document.getElementById('themeBtn');
-    const root = document.documentElement;
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
-    themeBtn.onclick = () => {
-      const isDark = root.getAttribute('data-theme') === 'dark';
-      root.setAttribute('data-theme', isDark ? 'light' : 'dark');
-      localStorage.setItem('theme', isDark ? 'light' : 'dark');
-    };
+// ─── UNTERRICHTSPLAN ─────────────────────────────────────────────────────────
+let plan = [], currentStep = 0;
+let dragSrcPlan = null;
 
-    // Tabs
-    const tabs = document.querySelectorAll('#tabs button');
-    tabs.forEach(btn => btn.addEventListener('click', () => {
-      tabs.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelectorAll('main > section').forEach(s => s.hidden = true);
-      document.getElementById('tab-' + btn.dataset.tab).hidden = false;
-    }));
+const typeLabels = { einstieg:'Einstieg', erarbeitung:'Erarbeitung', sicherung:'Sicherung', transfer:'Transfer', abschluss:'Abschluss' };
 
-    // Beispiel-Daten
-    const sampleGoals = [
-      'Ich kann Brüche mit unterschiedlichem Nenner addieren.',
-      'Ich erkläre den Begriff Hauptnenner in eigenen Worten.',
-      'Ich löse drei Anwendungsaufgaben zu Brüchen.'
-    ];
-    const samplePlan = [
-      { title: 'Einstieg: Blitzlicht – Was fällt euch zu Brüchen ein?', minutes: 5 },
-      { title: 'Input: Hauptnenner finden', minutes: 10 },
-      { title: 'Partnerarbeit: Aufgabenblatt A', minutes: 15 },
-      { title: 'Sicherung: Lösungen besprechen', minutes: 10 }
-    ];
-
-    // Speicher-Helper
-    const store = {
-      get(k, v=[]) { try { return JSON.parse(localStorage.getItem(k)) ?? v; } catch { return v; } },
-      set(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
-    };
-
-    // Ziele
-    const goalList = document.getElementById('goalList');
-    const goalInput = document.getElementById('goalInput');
-    const addGoalBtn = document.getElementById('addGoal');
-    const goalTemplates = document.getElementById('goalTemplates');
-    function renderGoals() {
-      const goals = store.get('goals', sampleGoals.map(t => ({text:t, done:false})));
-      goalList.innerHTML = '';
-      goals.forEach((g, i) => {
-        const div = document.createElement('div'); div.className='item';
-        div.innerHTML = `<input type="checkbox" ${g.done?'checked':''} aria-label="Ziel abhaken"/>`+
-                        `<div style="flex:1">${g.text}</div>`+
-                        `<button class="icon-btn" aria-label="Entfernen">✕</button>`;
-        const [cb,,rm] = div.children;
-        cb.onchange = () => { goals[i].done = cb.checked; store.set('goals', goals); syncBeamerGoals(); };
-        rm.onclick = () => { goals.splice(i,1); store.set('goals', goals); renderGoals(); syncBeamerGoals(); };
-        goalList.appendChild(div);
-      });
-      store.set('goals', goals);
+function renderPlan(){
+  const path = $('#planPath'); path.innerHTML='';
+  plan.forEach((p,i) => {
+    if(i>0){
+      const conn = document.createElement('div');
+      conn.className='plan-connector'; path.appendChild(conn);
     }
-    addGoalBtn.onclick = () => {
-      const txt = goalInput.value.trim(); if (!txt) return; const goals = store.get('goals', []);
-      goals.push({text:txt, done:false}); store.set('goals', goals); goalInput.value=''; renderGoals(); syncBeamerGoals();
-    };
-    goalTemplates.innerHTML = sampleGoals.map(t => `<button class="icon-btn">${t}</button>`).join('');
-    Array.from(goalTemplates.children).forEach((b,i)=> b.onclick = () => { goalInput.value = sampleGoals[i]; });
+    const node = document.createElement('div');
+    const isDone = i < currentStep;
+    const isCurrent = i === currentStep;
+    node.className = 'plan-node' + (isCurrent?' current':'') + (isDone?' done':'');
+    node.draggable = true;
+    node.innerHTML = `
+      <button class="node-del" data-pdel="${i}">✕</button>
+      <div class="node-step">Schritt ${i+1}</div>
+      <div class="node-title">${p.title}</div>
+      <span class="node-badge badge-${p.type}">${typeLabels[p.type]||p.type}</span>
+      <div class="small-muted">${p.dur} Min</div>`;
+    node.addEventListener('dragstart', e => { dragSrcPlan=i; node.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+    node.addEventListener('dragend', () => { node.classList.remove('dragging'); });
+    node.addEventListener('dragover', e => { e.preventDefault(); });
+    node.addEventListener('drop', e => {
+      e.preventDefault();
+      if(dragSrcPlan===null||dragSrcPlan===i) return;
+      const moved = plan.splice(dragSrcPlan,1)[0]; plan.splice(i,0,moved);
+      dragSrcPlan=null; currentStep=Math.min(currentStep,plan.length-1); renderPlan(); saveAll();
+    });
+    path.appendChild(node);
+  });
+  $$('[data-pdel]', path).forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation();
+    plan.splice(parseInt(b.dataset.pdel),1);
+    currentStep = Math.min(currentStep, Math.max(0,plan.length-1));
+    renderPlan(); saveAll();
+  }));
+  $('#planProgress').textContent = plan.length ? `Schritt ${currentStep+1} / ${plan.length}` : 'Keine Schritte';
+}
 
-    // Unterrichtsplan
-    const planList = document.getElementById('planList');
-    const addPlanItem = document.getElementById('addPlanItem');
-    const planTitle = document.getElementById('planTitle');
-    function renderPlan() {
-      const plan = store.get('plan', samplePlan);
-      planList.innerHTML='';
-      plan.forEach((p, i) => {
-        const row = document.createElement('div'); row.className='item';
-        row.innerHTML = `<div style="flex:1"><b>${i+1}.</b> ${p.title}</div>`+
-                        `<div class="meta" style="width:80px; text-align:right">${p.minutes||0} min</div>`+
-                        `<button class="icon-btn">✕</button>`;
-        const rm = row.querySelector('button'); rm.onclick=()=>{ plan.splice(i,1); store.set('plan', plan); renderPlan(); fillTodayPlan(); };
-        planList.appendChild(row);
-      });
-      store.set('plan', plan);
-    }
-    addPlanItem.onclick = () => {
-      const title = prompt('Schritt-Titel?'); if (!title) return; const minutes = Number(prompt('Minuten?')||0);
-      const plan = store.get('plan', []); plan.push({title, minutes}); store.set('plan', plan); renderPlan(); fillTodayPlan();
-    };
-    document.getElementById('clearPlan').onclick = ()=>{ if(confirm('Plan leeren?')) { store.set('plan', []); renderPlan(); fillTodayPlan(); } };
+$('#addStep').addEventListener('click', () => {
+  const t = $('#stepTitle').value.trim(); if(!t) return;
+  plan.push({ title:t, type:$('#stepType').value, dur:parseInt($('#stepDur').value)||10 });
+  $('#stepTitle').value=''; renderPlan(); saveAll();
+});
+$('#stepTitle').addEventListener('keydown', e => { if(e.key==='Enter') $('#addStep').click(); });
+$('#nextStep').addEventListener('click', () => { if(currentStep<plan.length-1){ currentStep++; renderPlan(); saveAll(); } });
+$('#prevStep').addEventListener('click', () => { if(currentStep>0){ currentStep--; renderPlan(); saveAll(); } });
+$('#resetPlan').addEventListener('click', () => { currentStep=0; renderPlan(); saveAll(); });
 
-    // Plan teilen via QR (als JSON-URL)
-    document.getElementById('sharePlan').onclick = () => {
-      const data = encodeURIComponent(JSON.stringify({title: planTitle.value || 'Unterricht', steps: store.get('plan', [])}));
-      const url = location.origin + location.pathname + `#plan=` + data;
-      tabs.forEach(b=> b.classList.remove('active'));
-      document.querySelector('[data-tab="qr"]').classList.add('active');
-      document.querySelectorAll('main > section').forEach(s => s.hidden = true);
-      document.getElementById('tab-qr').hidden = false;
-      document.getElementById('qrText').value = url;
-      makeQR();
-    };
+const templates = {
+  standard: [
+    {title:'Einstieg', type:'einstieg', dur:5},
+    {title:'Erarbeitungsphase', type:'erarbeitung', dur:20},
+    {title:'Sicherung', type:'sicherung', dur:10},
+    {title:'Transfer', type:'transfer', dur:10},
+    {title:'Abschluss', type:'abschluss', dur:5}
+  ],
+  projekt: [
+    {title:'Projektvorstellung', type:'einstieg', dur:5},
+    {title:'Gruppenarbeit', type:'erarbeitung', dur:25},
+    {title:'Präsentation', type:'transfer', dur:10},
+    {title:'Feedback', type:'abschluss', dur:5}
+  ],
+  diskussion: [
+    {title:'Thema einführen', type:'einstieg', dur:5},
+    {title:'Diskussion', type:'erarbeitung', dur:20},
+    {title:'Zusammenfassung', type:'sicherung', dur:10},
+    {title:'Reflexion', type:'abschluss', dur:5}
+  ]
+};
+$('#tplStandard').addEventListener('click', () => { plan=[...templates.standard]; currentStep=0; renderPlan(); saveAll(); });
+$('#tplProjekt').addEventListener('click', () => { plan=[...templates.projekt]; currentStep=0; renderPlan(); saveAll(); });
+$('#tplDiskussion').addEventListener('click', () => { plan=[...templates.diskussion]; currentStep=0; renderPlan(); saveAll(); });
 
-    // Hash-Import eines Plans
-    function importFromHash(){
-      const h = location.hash; const m = h.match(/#plan=([^#]+)/);
-      if (m){ try { const obj = JSON.parse(decodeURIComponent(m[1])); planTitle.value = obj.title||''; store.set('plan', obj.steps||[]); renderPlan(); fillTodayPlan(); } catch(e){} }
-    }
+// ─── QR CODES ────────────────────────────────────────────────────────────────
+let qrcards = [];
+let dragSrcQR = null;
 
-    // Dashboard: Heute im Überblick
-    function fillTodayPlan(){
-      const cont = document.getElementById('todayPlan'); cont.innerHTML='';
-      const plan = store.get('plan', samplePlan);
-      plan.forEach((p,i)=>{
-        const d = document.createElement('div'); d.className='item';
-        d.innerHTML = `<div style="flex:1">${i+1}. ${p.title}</div><div class="meta">${p.minutes||0} min</div>`;
-        cont.appendChild(d);
-      });
-    }
+function renderQR(){
+  const grid = $('#qrGrid'); grid.innerHTML='';
+  qrcards.forEach((q,i) => {
+    const card = document.createElement('div');
+    card.className='qr-card'; card.draggable=true;
+    card.innerHTML = `
+      <div class="qr-name">${q.name}</div>
+      <div class="qr-img-wrap" id="qrimg_${i}"></div>
+      <div class="qr-url" title="${q.url}">${q.url}</div>
+      <div class="row" style="gap:6px;">
+        <button class="btn small ghost" data-copy="${i}" title="URL kopieren">📋</button>
+        <button class="btn small ghost" data-qrdel="${i}">✕</button>
+      </div>`;
+    card.addEventListener('dragstart', e => { dragSrcQR=i; card.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    card.addEventListener('dragover', e => e.preventDefault());
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      if(dragSrcQR===null||dragSrcQR===i) return;
+      const moved = qrcards.splice(dragSrcQR,1)[0]; qrcards.splice(i,0,moved);
+      dragSrcQR=null; renderQR(); saveAll();
+    });
+    grid.appendChild(card);
+    setTimeout(() => {
+      const wrap = $(`#qrimg_${i}`);
+      if(!wrap) return;
+      try{
+        new QRCode(wrap, { text:q.url, width:120, height:120, colorDark:'#1a1a2e', colorLight:'#ffffff' });
+      }catch(e){}
+    }, 0);
+  });
+  $$('[data-copy]').forEach(b => b.addEventListener('click', () => {
+    navigator.clipboard.writeText(qrcards[b.dataset.copy].url).then(()=>{ b.textContent='✓'; setTimeout(()=>b.textContent='📋',1500); });
+  }));
+  $$('[data-qrdel]').forEach(b => b.addEventListener('click', () => {
+    qrcards.splice(parseInt(b.dataset.qrdel),1); renderQR(); saveAll();
+  }));
+}
+$('#addQR').addEventListener('click', () => {
+  const name = $('#qrName').value.trim() || 'Link';
+  let url = $('#qrUrl').value.trim();
+  if(!url){ alert('Bitte URL eingeben.'); return; }
+  if(!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://'+url;
+  try{ new URL(url); }catch(e){ alert('Ungültige URL.'); return; }
+  qrcards.push({name, url});
+  $('#qrName').value=''; $('#qrUrl').value='';
+  renderQR(); saveAll();
+});
+$('#qrUrl').addEventListener('keydown', e => { if(e.key==='Enter') $('#addQR').click(); });
 
-    // Lesson state
-    const stages = ['Einstieg','Erarbeitung','Sicherung','Reflexion'];
-    let stageIdx = 0;
-    function saveLesson(){ store.set('lesson', {title: lessonTitle.value, cls: lessonClass.value, stageIdx}); }
-    function loadLesson(){ const l = store.get('lesson', {title:'Brüche addieren', cls:'7b', stageIdx:0}); lessonTitle.value = l.title; lessonClass.value = l.cls; stageIdx = l.stageIdx||0; updateStage(); }
-    function updateStage(){ document.getElementById('lessonStage').textContent = stages[stageIdx%stages.length]; saveLesson(); }
-    const lessonTitle = document.getElementById('lessonTitle');
-    const lessonClass = document.getElementById('lessonClass');
-    document.getElementById('startLesson').onclick = ()=>{ stageIdx=0; updateStage(); };
-    document.getElementById('advanceStage').onclick = ()=>{ stageIdx++; updateStage(); };
-    document.getElementById('resetLesson').onclick = ()=>{ stageIdx=0; updateStage(); };
-    lessonTitle.onchange = saveLesson; lessonClass.onchange = saveLesson;
+// ─── INIT ────────────────────────────────────────────────────────────────────
+loadGlobals();
+loadAll();
 
-    // Zeit: Dashboard Timer + Countdown + Stoppuhr + Alarm
-    function fmt(t){ const m = Math.floor(t/60).toString().padStart(2,'0'); const s = Math.floor(t%60).toString().padStart(2,'0'); return `${m}:${s}`; }
-
-    // Dashboard timer (simple stopwatch)
-    let dInt=null, dT=0, dRun=false;
-    const dDisp = document.getElementById('dashboardTimer');
-    function dTick(){ dT += .1; dDisp.textContent = fmt(dT); if (beamer.classList.contains('active')) beamerTime.textContent = fmt(dT); }
-    document.getElementById('dashStart').onclick = ()=>{ if(!dRun){ dRun=true; dInt=setInterval(dTick,100); } };
-    document.getElementById('dashPause').onclick = ()=>{ dRun=false; clearInterval(dInt); };
-    document.getElementById('dashReset').onclick = ()=>{ dRun=false; clearInterval(dInt); dT=0; dDisp.textContent='00:00'; if (beamer.classList.contains('active')) beamerTime.textContent='00:00'; };
-
-    // Countdown
-    let cInt=null, cLeft=0, cRun=false;
-    const cDisp = document.getElementById('countDisplay');
-    function cTick(){ if(cLeft<=0){ clearInterval(cInt); cRun=false; cDisp.textContent='00:00'; try{ alarmSound.play(); }catch{} return; } cLeft--; cDisp.textContent=fmt(cLeft); if (beamer.classList.contains('active')) beamerTime.textContent=fmt(cLeft); }
-    document.getElementById('countStart').onclick = ()=>{ const m=Number(countMin.value||0), s=Number(countSec.value||0); cLeft=m*60+s; cDisp.textContent=fmt(cLeft); clearInterval(cInt); cRun=true; cInt=setInterval(cTick,1000); };
-    document.getElementById('countPause').onclick = ()=>{ cRun=false; clearInterval(cInt); };
-    document.getElementById('countReset').onclick = ()=>{ cRun=false; clearInterval(cInt); cLeft=0; cDisp.textContent='00:00'; };
-
-    // Stoppuhr
-    let swInt=null, swBase=0, swElapsed=0, swRunning=false;
-    const swDisp = document.getElementById('stopwatch');
-    function swRender(){ const t = swRunning ? (Date.now()-swBase)+swElapsed : swElapsed; const ms = Math.floor(t%1000/100); const s=Math.floor(t/1000)%60; const m=Math.floor(t/60000); swDisp.textContent=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}.${ms}`; }
-    function swStart(){ if(!swRunning){ swRunning=true; swBase=Date.now(); swInt=setInterval(swRender,100); } }
-    function swStop(){ if(swRunning){ swRunning=false; clearInterval(swInt); swElapsed += Date.now()-swBase; swRender(); } }
-    function swReset(){ swRunning=false; clearInterval(swInt); swElapsed=0; swRender(); swLaps.innerHTML=''; }
-    document.getElementById('swStart').onclick = swStart;
-    document.getElementById('swStop').onclick = swStop;
-    document.getElementById('swReset').onclick = swReset;
-    document.getElementById('swLap').onclick = ()=>{ const li=document.createElement('div'); li.className='item'; li.textContent=swDisp.textContent; swLaps.appendChild(li); };
-
-    // Alarm
-    const alarmStatus = document.getElementById('alarmStatus');
-    const alarmSound = document.getElementById('alarmSound');
-    let alarmAt = null; let alarmTimer=null;
-    document.getElementById('setAlarm').onclick = ()=>{
-      const t = document.getElementById('alarmTime').value; if(!t) return; const [hh,mm] = t.split(':').map(Number);
-      const now = new Date(); const a = new Date(); a.setHours(hh, mm, 0, 0); if (a < now) a.setDate(a.getDate()+1);
-      alarmAt = a.getTime(); alarmStatus.textContent = 'Wecker für '+a.toLocaleTimeString(); clearInterval(alarmTimer);
-      alarmTimer = setInterval(()=>{ if(Date.now()>=alarmAt){ clearInterval(alarmTimer); try{ alarmSound.play(); }catch{} alert('Wecker!'); alarmStatus.textContent='Kein Wecker gesetzt'; } }, 1000);
-    };
-
-    // QR Code (minimal Implementation – ohne externe Lib)
-    // Nutzt Canvas und eine kleine QR-Generator-Implementierung (qrcode.js public domain stark vereinfacht)
-    // Für die Sandbox hier eine einfache Fallback-Lösung via Google Chart API (offline wird letztes Bild genutzt)
-    const qrCanvas = document.getElementById('qrCanvas');
-    function makeQR(){ const txt = document.getElementById('qrText').value.trim(); if(!txt) return; const url=`https://chart.googleapis.com/chart?cht=qr&chs=400x400&chl=${encodeURIComponent(txt)}`; const img=new Image(); img.crossOrigin='anonymous'; img.onload=()=>{ const s=qrCanvas; s.width=img.width; s.height=img.height; const ctx=s.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,s.width,s.height); ctx.drawImage(img,0,0); }; img.src=url; }
-    document.getElementById('makeQR').onclick = makeQR;
-
-    // QR speichern/auflisten
-    function saveCurrentQR(){ try { const data = qrCanvas.toDataURL('image/png'); const txt = document.getElementById('qrText').value.trim() || 'QR'; const arr = store.get('qrs', []); arr.push({title: txt.slice(0,60), data, t: Date.now()}); store.set('qrs', arr); listSavedQR(); } catch(e){ alert('Kein QR zum Speichern.'); } }
-    function listSavedQR(){ const wrap=document.getElementById('qrSaved'); wrap.innerHTML=''; const arr=store.get('qrs', []); if(!arr.length){ wrap.innerHTML='<div class="meta">Noch keine QR-Codes gespeichert.</div>'; return; } arr.slice().reverse().forEach((q,i)=>{ const d=document.createElement('div'); d.className='item'; d.innerHTML=`<div style=\"flex:1\"><b>${q.title}</b><div class=\"meta\">${new Date(q.t).toLocaleString()}</div></div>`+
-      `<a class=\"icon-btn\" download=\"qr.png\" href=\"${q.data}\">Download</a>`; wrap.appendChild(d); }); }
-    document.getElementById('saveQR').onclick = saveCurrentQR;
-    document.getElementById('listQR').onclick = listSavedQR;
-
-    // Beamer-Modus
-    const beamer = document.getElementById('beamer');
-    const beamerBtn = document.getElementById('beamerBtn');
-    const beamerTime = document.getElementById('beamerTime');
-    const beamerGoals = document.getElementById('beamerGoals');
-    function syncBeamerGoals(){ const goals=store.get('goals', sampleGoals.map(t=>({text:t,done:false}))); beamerGoals.innerHTML = '<ul>'+goals.map(g=>`<li>${g.done?'✅':'⬜️'} ${g.text}</li>`).join('')+'</ul>'; }
-    beamerBtn.onclick = ()=>{ beamer.classList.add('active'); syncBeamerGoals(); beamerTime.textContent = dDisp.textContent; };
-    document.getElementById('exitBeamer').onclick = ()=>{ beamer.classList.remove('active'); };
-
-    // Service Worker
-    if ('serviceWorker' in navigator){ window.addEventListener('load', ()=> navigator.serviceWorker.register('service-worker.js')); }
-
-    // Init
-    function init(){
-      renderGoals(); renderPlan(); fillTodayPlan(); loadLesson(); importFromHash(); listSavedQR(); swRender();
-    }
-    init();
-  </script>
+// ─── PWA Service Worker (blob trick) ─────────────────────────────────────────
+(function(){
+  const sw = `
+self.addEventListener('install', e => { self.skipWaiting(); });
+self.addEventListener('activate', e => { self.clients.claim(); });
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.open('falbk-v2').then(cache =>
+      fetch(e.request).then(r => { cache.put(e.request, r.clone()); return r; })
+      .catch(() => caches.match(e.request))
+    )
+  );
+});`;
+  const blob = new Blob([sw], {type:'text/javascript'});
+  if('serviceWorker' in navigator) navigator.serviceWorker.register(URL.createObjectURL(blob));
+})();
+</script>
 </body>
 </html>
+</artifact>
