@@ -1,0 +1,14 @@
+{
+  "name": "Unterrichtsassistent",
+  "short_name": "U-Assi",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#2C3E50",
+  "theme_color": "#FF6B35",
+  "description": "PWA Unterrichtsassistent: Timer, Stoppuhr, Wecker, Ziele, Unterrichtsplan, QR-Codes, Dark Mode, offline & lokal.",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

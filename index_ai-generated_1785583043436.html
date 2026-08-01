@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unterrichtsplan – Klassen & Fächer</title>
+  <meta name="theme-color" content="#0a84ff" />
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root{
+      --bg: #f5f5f7; /* Apple-like gray */
+      --card: #ffffff;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --tint: #0a84ff; /* iOS blue */
+      --success:#34c759;
+      --danger:#ff3b30;
+      --orange:#ff9f0a;
+      --radius: 18px;
+      --shadow: 0 8px 30px rgba(0,0,0,.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background:var(--bg); color:var(--text);
+      -webkit-font-smoothing: antialiased; text-rendering:optimizeLegibility;
+    }
+    header{
+      position:sticky; top:0; z-index:1000; backdrop-filter:saturate(180%) blur(20px);
+      background:rgba(245,245,247,.7); border-bottom:1px solid rgba(0,0,0,.06);
+    }
+    .toolbar{display:flex; gap:12px; align-items:center; padding:14px 16px; max-width:1200px; margin:auto}
+    .toolbar h1{font-size:20px; font-weight:700; margin:0; letter-spacing:.2px}
+    .toolbar .spacer{flex:1}
+    .btn{appearance:none; border:1px solid rgba(0,0,0,.08); background:var(--card); color:var(--text);
+      padding:10px 14px; border-radius:12px; box-shadow:var(--shadow); cursor:pointer; font-weight:600}
+    .btn.primary{background:var(--tint); color:white; border-color:transparent}
+    .grid{max-width:1200px; margin:22px auto; display:grid; grid-template-columns:repeat(12,1fr); gap:16px; padding:0 16px}
+    .card{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; position:relative; user-select:none}
+    .card .title{font-weight:700; margin-bottom:10px}
+    .widget{grid-column: span 4; min-height:160px}
+    .dragging{opacity:.7; outline:2px dashed var(--tint)}
+    .handle{position:absolute; top:10px; right:10px; display:flex; gap:6px}
+    .badge{font-size:12px; color:white; background:var(--tint); padding:4px 8px; border-radius:999px}
+    .resize{position:absolute; right:8px; bottom:8px; width:16px; height:16px; border-right:2px solid #c7c7cc; border-bottom:2px solid #c7c7cc; cursor:nwse-resize}
+
+    /* Timetable */
+    .timetable{display:grid; grid-template-columns: 120px repeat(5, 1fr); gap:8px}
+    .timetable .cell{background:#fafafa; border:1px solid #ececec; border-radius:12px; padding:10px; min-height:54px}
+    .timetable .header{font-weight:700; color:var(--muted); background:transparent; border:none}
+
+    /* Fullscreen timer */
+    #fsOverlay{position:fixed; inset:0; background:#000; color:#fff; display:none; align-items:center; justify-content:center; flex-direction:column}
+    #fsTime{font-size:18vw; line-height:1; font-weight:800; letter-spacing:-1px}
+    #fsLabel{margin-top:12px; color:#ccc}
+    #closeFS{position:absolute; top:20px; right:20px}
+
+    /* Sidebar for classes/subjects */
+    .panel{grid-column: span 3}
+    .list{display:flex; flex-direction:column; gap:10px}
+    .item{display:flex; align-items:center; justify-content:space-between; background:#fafafa; border:1px solid #ececec; border-radius:12px; padding:10px 12px}
+    input, select{width:100%; padding:10px 12px; border-radius:12px; border:1px solid #e0e0e0; background:white}
+    .row{display:flex; gap:10px}
+    .row > *{flex:1}
+
+    footer{max-width:1200px; margin:30px auto; padding:0 16px; color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="toolbar">
+      <h1>Unterrichtsplan</h1>
+      <button class="btn" id="addWidget">Widget hinzufügen</button>
+      <button class="btn" id="goFS">Fullscreen Timer</button>
+      <div class="spacer"></div>
+      <button class="btn" id="save">Speichern</button>
+      <button class="btn" id="load">Laden</button>
+      <button class="btn primary" id="askAI">KI Assistent</button>
+    </div>
+  </header>
+
+  <main class="grid" id="grid">
+    <section class="card panel">
+      <div class="title">Klassen-Management</div>
+      <div class="row">
+        <select id="classBase">
+          <option>IMG</option>
+          <option>GT</option>
+          <option>BGG</option>
+          <option>BGI</option>
+        </select>
+        <input id="classYear" type="text" placeholder="Schuljahr (z.B. 24/25)" value="24/25" />
+        <button class="btn" id="addClass">Hinzufügen</button>
+      </div>
+      <div class="list" id="classList"></div>
+    </section>
+
+    <section class="card panel">
+      <div class="title">Fächer-Datenbank</div>
+      <div class="row">
+        <input id="subjectName" type="text" placeholder="Fach (z.B. Mathematik)">
+        <input id="subjectShort" type="text" placeholder="Kürzel (z.B. M)" style="max-width:120px">
+        <button class="btn" id="addSubject">Speichern</button>
+      </div>
+      <div class="list" id="subjectList"></div>
+    </section>
+
+    <section class="card widget" data-type="timetable">
+      <div class="handle">
+        <span class="badge">Plan</span>
+      </div>
+      <div class="title">Unterrichtsplan (mehrere Stunden)</div>
+      <div class="timetable" id="timetable">
+        <div class="cell header"></div>
+        <div class="cell header">Mo</div>
+        <div class="cell header">Di</div>
+        <div class="cell header">Mi</div>
+        <div class="cell header">Do</div>
+        <div class="cell header">Fr</div>
+        <!-- 8 Zeitfenster -->
+      </div>
+      <div class="resize"></div>
+    </section>
+
+    <section class="card widget" data-type="notes">
+      <div class="handle"><span class="badge" style="background:var(--orange)">Notizen</span></div>
+      <textarea style="width:100%; height:120px; border:none; outline:none; resize:none" placeholder="Notizen..." id="notes"></textarea>
+      <div class="resize"></div>
+    </section>
+
+    <section class="card widget" data-type="timer">
+      <div class="handle"><span class="badge" style="background:var(--success)">Timer</span></div>
+      <div class="row">
+        <input id="timerMin" type="number" min="0" value="5"> 
+        <button class="btn" id="startTimer">Start</button>
+        <button class="btn" id="resetTimer">Reset</button>
+      </div>
+      <h2 id="timerDisplay" style="font-size:42px; margin:12px 0 0 0">05:00</h2>
+      <div class="resize"></div>
+    </section>
+  </main>
+
+  <div id="fsOverlay">
+    <button class="btn" id="closeFS">Schließen</button>
+    <div id="fsTime">05:00</div>
+    <div id="fsLabel">Timer/Wecker</div>
+  </div>
+
+  <footer>
+    Tippe und ziehe Widgets, ziehe die Ecke zum Vergrößern. Daten werden lokal gespeichert. KI: OpenAI API Key im Browser setzen.
+  </footer>
+
+  <script>
+    // PWA basics
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+    }
+
+    // Layout/state
+    const grid = document.getElementById('grid');
+    const state = JSON.parse(localStorage.getItem('app-state')||'{}');
+
+    // Utility
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+    // Build timetable hours
+    const timetable = document.getElementById('timetable');
+    const hours = ['08:00','08:45','09:35','10:30','11:20','12:10','13:00','13:50'];
+    function renderTimetable(){
+      // clear old rows after headers
+      timetable.querySelectorAll('.rowline').forEach(n=>n.remove());
+      hours.forEach((h,i)=>{
+        const row = document.createElement('div'); row.className='rowline'; row.style.display='contents';
+        const timeCell = document.createElement('div'); timeCell.className='cell header'; timeCell.textContent=h; row.appendChild(timeCell);
+        for(let d=0; d<5; d++){
+          const c = document.createElement('div'); c.className='cell'; c.contentEditable=true; c.dataset.key = `r${i}d${d}`;
+          c.textContent = (state.timetable && state.timetable[c.dataset.key]) || '';
+          c.addEventListener('input', ()=>{
+            state.timetable = state.timetable||{}; state.timetable[c.dataset.key]=c.textContent; saveState();
+          });
+          row.appendChild(c);
+        }
+        timetable.appendChild(row);
+      });
+    }
+    renderTimetable();
+
+    // Classes
+    const classList = document.getElementById('classList');
+    const classes = new Set(state.classes||[]);
+    function renderClasses(){
+      classList.innerHTML='';
+      [...classes].sort().forEach(k=>{
+        const it = document.createElement('div'); it.className='item';
+        it.innerHTML = `<span>${k}</span><button class="btn" data-k="${k}">Entfernen</button>`;
+        it.querySelector('button').onclick = (e)=>{ classes.delete(k); saveState(); renderClasses(); };
+        classList.appendChild(it);
+      })
+    }
+    renderClasses();
+    document.getElementById('addClass').onclick = () =>{
+      const base = document.getElementById('classBase').value.trim();
+      const year = document.getElementById('classYear').value.trim();
+      if(!base||!year) return;
+      classes.add(`${base}-${year}`);
+      saveState(); renderClasses();
+    };
+
+    // Subjects DB
+    const subjectList = document.getElementById('subjectList');
+    const subjects = state.subjects||[];
+    function renderSubjects(){
+      subjectList.innerHTML='';
+      subjects.forEach((s,idx)=>{
+        const it = document.createElement('div'); it.className='item';
+        it.innerHTML = `<span>${s.short} – ${s.name}</span><button class="btn" data-i="${idx}">✕</button>`;
+        it.querySelector('button').onclick = ()=>{ subjects.splice(idx,1); saveState(); renderSubjects(); };
+        subjectList.appendChild(it);
+      })
+    }
+    renderSubjects();
+    document.getElementById('addSubject').onclick=()=>{
+      const n = document.getElementById('subjectName');
+      const sh = document.getElementById('subjectShort');
+      if(!n.value.trim()) return;
+      subjects.push({name:n.value.trim(), short: sh.value.trim()||n.value.trim()[0].toUpperCase()});
+      n.value=''; sh.value=''; saveState(); renderSubjects();
+    };
+
+    // Widgets: drag + resize
+    let dragData=null, resizeData=null;
+    function makeDraggable(card){
+      card.draggable=true;
+      card.addEventListener('dragstart', (e)=>{
+        dragData={el:card, startX:e.clientX, startY:e.clientY, startIndex:[...grid.children].indexOf(card)};
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed='move';
+        e.dataTransfer.setData('text/plain','drag');
+      });
+      card.addEventListener('dragend', ()=>{ card.classList.remove('dragging'); saveOrder(); });
+    }
+    function saveOrder(){
+      const order = [...grid.querySelectorAll('.widget')].map(el=>el.dataset.type);
+      state.order = order; saveState();
+    }
+    grid.addEventListener('dragover',(e)=>{
+      e.preventDefault();
+      const dragging = grid.querySelector('.dragging');
+      const afterElement = getDragAfterElement(grid, e.clientY);
+      if(afterElement==null){ grid.appendChild(dragging);} else { grid.insertBefore(dragging, afterElement); }
+    });
+    function getDragAfterElement(container, y){
+      const els = [...container.querySelectorAll('.widget:not(.dragging)')];
+      return els.reduce((closest, child)=>{
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height/2;
+        if(offset < 0 && offset > closest.offset){ return {offset, element: child}; }
+        else { return closest; }
+      }, {offset: Number.NEGATIVE_INFINITY}).element;
+    }
+
+    $$('.widget').forEach(w=>{ makeDraggable(w); w.querySelector('.resize').addEventListener('mousedown', (e)=>{
+      e.preventDefault(); resizeData={el:w, startX:e.clientX, startY:e.clientY, startH:w.offsetHeight, startW:w.offsetWidth};
+    })});
+    window.addEventListener('mousemove', (e)=>{
+      if(!resizeData) return; const dx = e.clientX-resizeData.startX; const dy=e.clientY-resizeData.startY;
+      resizeData.el.style.height = Math.max(120, resizeData.startH+dy)+'px';
+      resizeData.el.style.gridColumn = 'span '+ Math.min(12, Math.max(3, Math.round((resizeData.startW+dx)/ (grid.clientWidth/12))))
+    });
+    window.addEventListener('mouseup', ()=>{ if(resizeData){ resizeData=null; saveLayout(); }});
+
+    function saveLayout(){
+      state.layout = [...grid.querySelectorAll('.widget')].map(w=>({type:w.dataset.type, height:w.style.height||'', col:w.style.gridColumn||''}));
+      saveState();
+    }
+
+    function restoreLayout(){
+      if(state.order){
+        const map = {}; $$('.widget').forEach(w=> map[w.dataset.type]=w);
+        state.order.forEach(t=>{ if(map[t]) grid.appendChild(map[t]); });
+      }
+      if(state.layout){
+        state.layout.forEach(cfg=>{
+          const w = grid.querySelector(`.widget[data-type="${cfg.type}"]`);
+          if(w){ w.style.height=cfg.height; w.style.gridColumn=cfg.col; }
+        })
+      }
+    }
+    restoreLayout();
+
+    // Timer with fullscreen
+    let timer=null, remaining=0;
+    function fmt(s){ const m=Math.floor(s/60).toString().padStart(2,'0'); const r=(s%60).toString().padStart(2,'0'); return `${m}:${r}`}
+    function updateTimer(){ $('#timerDisplay').textContent=fmt(remaining); $('#fsTime').textContent=fmt(remaining); }
+    function startTimerSec(sec){ clearInterval(timer); remaining=sec; updateTimer(); timer=setInterval(()=>{ remaining--; updateTimer(); if(remaining<=0){ clearInterval(timer); remaining=0; updateTimer(); try{ new AudioContext().resume(); }catch{}; alert('Zeit abgelaufen!'); } },1000); }
+    document.getElementById('startTimer').onclick=()=>{
+      const min = Math.max(0, parseInt(document.getElementById('timerMin').value||'0',10));
+      startTimerSec(min*60);
+    };
+    document.getElementById('resetTimer').onclick=()=>{ clearInterval(timer); remaining=0; updateTimer(); };
+
+    // Fullscreen overlay handling
+    const fs = document.getElementById('fsOverlay');
+    document.getElementById('goFS').onclick=()=>{ fs.style.display='flex'; if(fs.requestFullscreen) fs.requestFullscreen(); };
+    document.getElementById('closeFS').onclick=()=>{ fs.style.display='none'; if(document.fullscreenElement) document.exitFullscreen(); };
+
+    // Save/load
+    function saveState(){ localStorage.setItem('app-state', JSON.stringify(state)); }
+    document.getElementById('save').onclick=()=> saveState();
+    document.getElementById('load').onclick=()=>{ const s = JSON.parse(localStorage.getItem('app-state')||'{}'); Object.assign(state, s); renderTimetable(); renderClasses(); renderSubjects(); restoreLayout(); };
+
+    // Add widget (notes duplicate for demo)
+    document.getElementById('addWidget').onclick=()=>{
+      const w = document.createElement('section'); w.className='card widget'; w.dataset.type='notes-'+Date.now();
+      w.innerHTML = `<div class="handle"><span class="badge" style="background:var(--orange)">Notizen</span></div>
+      <textarea style="width:100%; height:120px; border:none; outline:none; resize:none" placeholder="Notizen..."></textarea>
+      <div class="resize"></div>`;
+      grid.appendChild(w); makeDraggable(w); w.querySelector('.resize').addEventListener('mousedown', (e)=>{ e.preventDefault(); resizeData={el:w, startX:e.clientX, startY:e.clientY, startH:w.offsetHeight, startW:w.offsetWidth}; });
+      saveOrder(); saveLayout();
+    };
+
+    // Simple OpenAI client (user must provide key)
+    async function askOpenAI(prompt){
+      const key = localStorage.getItem('openai-key');
+      if(!key){ alert('Bitte OpenAI API-Key in localStorage unter "openai-key" speichern.'); return; }
+      const res = await fetch('https://api.openai.com/v1/chat/completions',{
+        method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+        body: JSON.stringify({ model:'gpt-4o-mini', messages:[{role:'user', content: prompt}] })
+      });
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || 'Keine Antwort';
+    }
+    document.getElementById('askAI').onclick = async ()=>{
+      const q = prompt('Frage an den KI-Assistenten:'); if(!q) return;
+      const btn = document.getElementById('askAI'); const old=btn.textContent; btn.textContent='…'; btn.disabled=true;
+      try{ const a = await askOpenAI(q); alert(a); } catch(e){ alert('Fehler bei der KI-Anfrage'); } finally { btn.textContent=old; btn.disabled=false; }
+    };
+  </script>
+</body>
+</html>
